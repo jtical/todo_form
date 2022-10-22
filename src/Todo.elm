@@ -2,7 +2,7 @@ module Todo exposing (main)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Browser
 
 
@@ -25,30 +25,58 @@ initialModel =
     }
 
 --VIEW 
-view : Model -> Html msg
+view : Model -> Html Msg
 view model =
     div []
         [ h1 [] [ text "TODO LIST" ]
         , Html.form []
             [ div []
                 [ text "Name"
-                , input [ id "name", type_ "text" ] []
+                , input [ id "name", type_ "text", onInput SaveName ] []
                 ]
             , div []
                 [ text "Task"
-                , input [ id "task", type_ "text" ] []
+                , input [ id "task", type_ "text", onInput SaveTask ] []
                 ]
             , div []
                 [ text "Status"
-                , input [ id "status", type_ "text" ] []
+                , input [ id "status", type_ "text", onInput SaveStatus ] []
                 ]
             , div []
-                [ button [ type_ "submit" ]
+                [ button [ type_ "submit", onClick Created ]
                     [ text "Create my list" ]
                 ]
             ]
         ]
 
-main : Html msg
+
+type Msg
+    = SaveName String
+    | SaveTask String
+    | SaveStatus String
+    | Created
+
+--UPDATE
+
+update : Msg -> Model -> Model
+update message model =
+    case message of
+        SaveName name ->
+            { model | name = name }
+
+        SaveTask task ->
+            { model | task = task }
+
+        SaveStatus status ->
+            { model | status = status }
+
+        Created ->
+            { model | createList = True }
+
+main : Program () Model Msg
 main =
-    view initialModel
+    Browser.sandbox
+        { init = initialModel
+        , view = view
+        , update = update
+        }
